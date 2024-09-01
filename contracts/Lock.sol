@@ -1,49 +1,40 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.20;
 
-contract FreeBar{
+contract GuessAndWin{
 
-    uint regId;
+    uint winningNumber =5;
 
     struct Person{
-        uint age;
-        uint id;
-        uint noOfDrinks;
-        address person;
+        address addr;
+        uint guess;
+        bool guessed;
     }
 
-    mapping (uint => Person) people;
-    mapping (address => bool) registered;
+    mapping (address => Person) guessers;
 
+   
+    function guess(uint _num) public {
+        Person storage person = guessers[msg.sender];
+        require( !person.guessed, "You have Already guessed");
+        person.guess = _num;
+        person.guessed = true;
 
-    function register( uint _age) public returns (uint){
-          uint _id = regId + 1;
-    Person storage newPerson = people[_id];
-    require(!registered[msg.sender], "Already registered");
-
-    newPerson.age = _age;
-    newPerson.person = msg.sender;
-    newPerson.noOfDrinks = 0;
-    registered[msg.sender]= true;
-
-    regId++;
-    
-    return _id;
     }
 
-    function orderDrink(uint _id) public   {
-        Person storage newPerson = people[_id];
-        require(newPerson.person == msg.sender, "not your id");
-        assert(newPerson.age > 18);
-        if (newPerson.noOfDrinks > 2){
-            revert();
+    function checkResult() public view returns(string memory){
+        Person storage person = guessers[msg.sender];
+        if(!person. guessed){
+            revert("You have not guessed");
+        }
+        assert(person.guess != 0);
+
+        if(person.guess == winningNumber){
+        return("Congratulations you win");
         }
         else{
-            newPerson.noOfDrinks ++;
+            revert("Wrong Number");
         }
-            
-
-
 
     }
 }
